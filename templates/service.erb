@@ -1,0 +1,24 @@
+# puppet managed
+
+[Unit]
+Description=System Logger Daemon
+Documentation=man:syslog-ng(8)
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=notify
+Sockets=syslog.socket
+PIDFile=/var/run/syslogd.pid
+ExecStartPre=/usr/sbin/syslog-ng --cfgfile /etc/syslog-ng/syslog-ng.conf --syntax-only
+ExecStart=/usr/sbin/syslog-ng --foreground --cfgfile /etc/syslog-ng/syslog-ng.conf --fd-limit 121000 --pidfile /var/run/syslogd.pid
+ExecStartPost=/bin/chmod 775 /var/lib/syslog-ng/syslog-ng.ctl
+ExecReload=/bin/kill -HUP $MAINPID
+StandardOutput=journal
+StandardError=journal
+Restart=on-failure
+LimitNOFILE=121000
+UMask=0002
+
+[Install]
+WantedBy=multi-user.target
+Alias=syslog.service

@@ -1,0 +1,101 @@
+# puppet managed
+# vim:ft=eruby:ai:si:ts=4:sw=4:et:
+@version:<%= @facts['syslog_ng_version'] %>
+
+options {
+    flush_lines (<%= @cfg['options']['flush_lines'] %>);
+    time_reopen (10);
+    chain_hostnames (off);
+    use_dns (no);
+    use_fqdn (no);
+    create_dirs (yes);
+    keep_hostname (yes);
+    log_msg_size (163840);
+    log-fifo-size (<%= @cfg['options']['log-fifo-size'] %>);
+    create_dirs (yes);
+    ts_format(iso);
+    frac-digits(3);
+    keep_timestamp(no); # нужно чтобы заработал frac_digits(3), ts_format(iso)
+    mark-freq(0); # нужно, чтобы не слать марки, когда нет логов
+    stats-level(0);
+    stats-max-dynamics(0); # syslog-ng >= 3.16
+};
+
+template t_long  { template("${YEAR}-${MONTH}-${DAY}T${HOUR}:${MIN}:${SEC}.${MSEC}\t$HOST\t${PROGRAM:-unknownprogram}\t$PID\t$MSG\n"); };
+template t_full  { template("${YEAR}-${MONTH}-${DAY}T${HOUR}:${MIN}:${SEC}.${MSEC}\t$HOST\t${PROGRAM:-unknownprogram}\t<$LEVEL>\t{$FACILITY}\t$PID\t$MSG\n"); };
+template t_short { template("$MSG\n"); };
+
+source s_sys {
+    file (
+        "/proc/kmsg"
+        program_override("kernel: ")
+    );
+    systemd-syslog( host-override("<%= @hostname %>") );
+<%- if @cfg['source']['s_sys']['network'] -%>
+    network ( ip("127.0.0.1") transport("udp") port(514) host-override("<%= @hostname %>") so-rcvbuf(4194304) );
+    network ( ip("127.0.0.1") transport("tcp") port(514) host-override("<%= @hostname %>") );
+<%- end -%>
+    unix-dgram ("/var/lib/syslog-ng/devlog");
+};
+
+# devnull
+destination d_null { };
+
+# these messages often cause problems so it makes sense to collect and log them
+filter f_bad_messages { program("[^a-zA-Z0-9_.-]"); };
+destination file_bad_messages { file("/var/log/syslog-ng/bad_messages.log" template(t_full)); };
+log {
+    source(s_sys);
+    source(s_internal);
+    filter(f_bad_messages);
+    destination(file_bad_messages);
+};
+
+# import specific configs
+@include "<%= @conf_dir %>/*.conf"
+
+# system log {{
+filter f_kernel     { facility(kern); };
+filter f_default    { level(info..emerg) and not facility(mail, authpriv, cron); };
+filter f_auth       { facility(authpriv) or facility(auth); };
+filter f_mail       { facility(mail); };
+filter f_emergency  { level(emerg); };
+filter f_news       { facility(uucp) or (facility(news) and level(crit..emerg)); };
+filter f_boot       { facility(local7); };
+filter f_cron       { facility(cron); };
+
+destination d_cons { file("/dev/console"); };
+destination d_mesg { file("/var/log/messages" template(t_full)); };
+destination d_auth { file("/var/log/secure"); };
+destination d_mail { file("/var/log/maillog" flush_lines(10)); };
+destination d_spol { file("/var/log/spooler"); };
+destination d_boot { file("/var/log/boot.log"); };
+destination d_cron { file("/var/log/cron"); };
+destination d_kern { file("/var/log/kern"); };
+destination d_mlal { usertty("*"); };
+
+log { source(s_sys); filter(f_kernel);      destination(d_kern); };
+log { source(s_sys); filter(f_default);     destination(d_mesg); };
+log { source(s_sys); filter(f_auth);        destination(d_auth); };
+log { source(s_sys); filter(f_mail);        destination(d_mail); };
+log { source(s_sys); filter(f_emergency);   destination(d_mlal); };
+log { source(s_sys); filter(f_news);        destination(d_spol); };
+log { source(s_sys); filter(f_boot);        destination(d_boot); };
+log { source(s_sys); filter(f_cron);        destination(d_cron); };
+# }}
+
+# internal logs (self syslog-ng) {{
+source s_internal { internal(); };
+filter f_error { level(err..emerg); };
+destination d_internal { file("/var/log/syslog-ng/info.log"); };
+destination d_internal_errors { file("/var/log/syslog-ng/error.log"); };
+log {
+    source(s_internal);
+    destination(d_internal);
+    log {
+        filter(f_error);
+        destination(d_internal_errors);
+    };
+    flags(final);
+};
+# }}

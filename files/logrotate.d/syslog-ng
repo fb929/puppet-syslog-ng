@@ -1,0 +1,58 @@
+# puppet managed
+
+/var/log/kern {
+    rotate 180
+    notifempty
+    missingok
+    daily
+    dateext
+    compress
+    create 0600 root root
+}
+/var/log/messages {
+    rotate 7
+    notifempty
+    missingok
+    daily
+    dateext
+    compress
+    create 0600 root root
+    postrotate
+        /sbin/service syslog-ng reload &>/dev/null
+    endscript
+}
+/var/log/maillog {
+    rotate 12
+    missingok
+    notifempty
+    daily
+    compress
+    delaycompress
+}
+/var/log/secure {
+    rotate 12
+    missingok
+    notifempty
+    weekly
+    compress
+    delaycompress
+}
+/var/log/cron {
+    rotate 12
+    missingok
+    notifempty
+    weekly
+    compress
+    delaycompress
+}
+/var/log/syslog-ng/*.log {
+    rotate 6
+    missingok
+    daily
+    maxsize 512M
+    compress
+    delaycompress
+    postrotate
+        /sbin/service syslog-ng reload &>/dev/null
+    endscript
+}

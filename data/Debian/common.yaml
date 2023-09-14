@@ -1,0 +1,5 @@
+---
+syslog_ng::install::packages:
+  syslog-ng:
+    ensure: present
+syslog_ng::config::control_logrotate_dir: false

@@ -1,0 +1,8 @@
+# puppet managed
+/var/log/boot.log
+{
+    missingok
+    daily
+    copytruncate
+    rotate 7
+}

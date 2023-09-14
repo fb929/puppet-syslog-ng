@@ -1,0 +1,10 @@
+---
+syslog_ng::install::packages: {}
+pkg::syslog-ng: 3.29.1
+syslog_ng::install::githubartifact:
+  syslog-ng:
+    org_name: "fb929"
+    repository: "syslog-ng"
+    releasetag: "v%{lookup('pkg::syslog-ng')}"
+    package_version: "%{lookup('pkg::syslog-ng')}-1.el7"
+    pattern: "syslog-ng-%{lookup('pkg::syslog-ng')}-1.el7.%{facts.os.architecture}.rpm"

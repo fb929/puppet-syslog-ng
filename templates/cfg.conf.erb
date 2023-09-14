@@ -1,0 +1,48 @@
+# puppet managed
+# vim:ft=eruby:ai:si:ts=4:sw=4:
+<%-
+@sname = @name.gsub(/[^\w-]/, '_')
+-%>
+filter f_<%= @sname %> { program("<%= @program %>"); };
+<%- if @save_local_file -%>
+
+destination file_<%= @sname %> { file("<%= @logdir %>/${PROGRAM}.log" template(<%= @template %>)); };
+    <%- if @error_level -%>
+destination file_<%= @sname %>_error { file("<%= @logdir %>/${PROGRAM}.error.log" template(<%= @template %>)); };
+    <%- end -%>
+<%- end -%>
+
+log {
+    source(s_sys);
+    filter(f_<%= @sname %>);
+    junction {
+        channel {
+<%- if @to_program -%>
+            rewrite { set('<%= @to_program %>', value("PROGRAM")); };
+<%- end -%>
+<%- if @save_local_file -%>
+            destination(file_<%= @sname %>);
+<%- end -%>
+<%- if @send_remote -%>
+            rewrite { set("all", value(".SDATA.custom@31853.1.level")); };
+            destination(remote);
+<%- end -%>
+        };
+<%- if @error_level -%>
+        channel {
+    <%- if @to_program -%>
+            rewrite { set('<%= @to_program %>', value("PROGRAM")); };
+    <%- end -%>
+            filter(f_error);
+    <%- if @save_local_file -%>
+            destination(file_<%= @sname %>_error);
+    <%- end -%>
+    <%- if @send_remote -%>
+            rewrite { set("error",  value(".SDATA.custom@31853.1.level")); };
+            destination(remote);
+    <%- end -%>
+        };
+    };
+<%- end -%>
+    flags(final);
+};

@@ -1,0 +1,33 @@
+# puppet managed
+# vim:ft=eruby:ai:si:ts=4:sw=4:
+<%- #@relay_ip = Resolv::DNS.open.getaddress(@destination_relay_server).to_s -%>
+
+destination remote {
+    channel {
+        rewrite {
+            set("<%= @facts['ec2_tag_role'] %>", value(".SDATA.custom@31853.1.role"));
+            set("<%= @facts['groupname'] %>", value(".SDATA.custom@31853.1.groupname"));
+        };
+        destination {
+<%- @cfg['destination']['remote'].each() do |name,settings| -%>
+            syslog(
+                "<%= settings['host'] %>"
+                port(<%= settings['port'] %>)
+                transport("tcp")
+                #flags(no-multi-line)
+    <%- if settings['persist_name'] -%>
+                persist-name("<%= settings['persist_name'] %>")
+    <%- end -%>
+    <%- if settings['disk_buffer']['enable'] -%>
+                disk-buffer(
+                    mem-buf-size(67108864) # 64M
+                    disk-buf-size(1073741824) # 1G
+                    reliable(no)
+                    dir("<%= settings['disk_buffer']['dir'] %>")
+                )
+    <%- end -%>
+            );
+<%- end -%>
+        };
+    };
+};

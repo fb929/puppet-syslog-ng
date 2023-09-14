@@ -1,0 +1,23 @@
+---
+syslog_ng::config::logrotate_count: 3
+syslog_ng::config::conf_dir: /etc/syslog-ng/conf.d
+syslog_ng::config::cfg:
+  options:
+    flush_lines: 256
+    log-fifo-size: 10000
+  destination:
+    remote:
+      # CHANGE_ME
+      #syslog:
+      #  host: syslog.local
+      #  port: 514
+      #  persist_name: syslog
+      #  disk_buffer:
+      #    enable: true
+      #    dir: /var/log/syslog-ng/disk-buffer-syslog
+  source:
+    s_sys:
+      network: true
+
+syslog_ng::config::control_logrotate_dir: true
+syslog_ng::monitoring::collectd: false

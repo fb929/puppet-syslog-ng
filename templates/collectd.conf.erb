@@ -1,0 +1,13 @@
+# puppet managed
+<LoadPlugin python>
+    Globals true
+</LoadPlugin>
+<Plugin python>
+    ModulePath "/opt/puppet/collectd"
+    LogTraces true
+    Interactive false
+    Import "syslog_ng_stats"
+    <Module syslog_ng_stats>
+        SocketPath "/var/lib/syslog-ng/syslog-ng.ctl"
+    </Module>
+</Plugin>
