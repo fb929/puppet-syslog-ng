@@ -19,5 +19,5 @@ syslog_ng::config::cfg:
     s_sys:
       network: true
 
-syslog_ng::config::control_logrotate_dir: true
+syslog_ng::config::control_logrotate_dir: false
 syslog_ng::monitoring::collectd: false
