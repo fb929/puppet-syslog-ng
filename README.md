@@ -1,7 +1,7 @@
 # syslog-ng
 ## setup
 ### r10k:
-adding in Puppetfile
+add in Puppetfile
 ```
 mod 'syslog_ng',
   :git => 'https://github.com/fb929/puppet-syslog-ng',
