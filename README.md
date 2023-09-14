@@ -1,4 +1,12 @@
 # syslog-ng
+## setup
+### r10k:
+adding in Puppetfile
+```
+mod 'syslog_ng',
+  :git => 'https://github.com/fb929/puppet-syslog-ng',
+  :tag => 'v0.0.1'
+```
 ## configuration
 adding in hiera:
 ```
