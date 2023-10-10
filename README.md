@@ -1,5 +1,11 @@
 # syslog-ng
 ## setup
+### requirements
+* [puppet-tools](https://github.com/fb929/puppet-tools)
+* [puppet-systemd 4.1.0](https://github.com/voxpupuli/puppet-systemd)
+* [githubartifact](https://github.com/fb929/puppet-githubartifact)
+* optional [collectd](https://github.com/fb929/puppet-collectd)
+
 ### r10k:
 add in Puppetfile
 ```

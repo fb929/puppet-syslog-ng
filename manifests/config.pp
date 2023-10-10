@@ -45,7 +45,7 @@ class syslog_ng::config (
     enable => true,
     active => true,
   }
-  common::file { "killDeleted.sh": source => "puppet:///modules/${module_name}/killDeleted.sh" }
+  tools::file { "killDeleted.sh": source => "puppet:///modules/${module_name}/killDeleted.sh" }
   $cfg['destination']['remote'].each |$destination_name, $destination_settings| {
     file {
       [
