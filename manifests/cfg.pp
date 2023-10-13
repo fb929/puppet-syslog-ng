@@ -8,7 +8,7 @@ define syslog_ng::cfg (
   Optional[String] $logrotate_content = undef, # template for logrotate
   # options for default template {{
   String $logdir = "/var/log/$name",
-  Boolean $send_remote = true, # send to remote syslog server
+  Boolean $send_remote = $::syslog_ng::config::send_remote, # send to remote syslog server
   Boolean $save_local_file = true, # save to local file
   Boolean $error_level = true, # writing a separate error level to a file and sending it to a remote server
   String $template = "t_long" # default template for log

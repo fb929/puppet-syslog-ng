@@ -3,6 +3,7 @@ class syslog_ng::config (
   String $conf_dir,
   Hash $cfg,
   Boolean $control_logrotate_dir,
+  Boolean $send_remote,
 ) {
   if $control_logrotate_dir {
     file {

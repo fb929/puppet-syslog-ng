@@ -21,3 +21,4 @@ syslog_ng::config::cfg:
 
 syslog_ng::config::control_logrotate_dir: false
 syslog_ng::monitoring::collectd: false
+syslog_ng::config::send_remote: false
