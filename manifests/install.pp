@@ -1,11 +1,20 @@
 class syslog_ng::install (
-  Optional[Hash] $packages = undef,
-  Optional[Hash] $githubartifact = undef,
+  Variant[Hash,Boolean] $packages = false,
+  Variant[Hash,Boolean] $githubartifact = false,
 ) {
   case $facts['os']['family'] {
     "RedHat": {
       if $githubartifact {
         ensure_resources("githubartifact::install", $githubartifact)
+      } elsif $packages {
+        ensure_resources(
+          package,
+          $packages,
+          {
+            ensure => present,
+            notify => Service["syslog-ng"],
+          }
+        )
       }
     }
     "Debian": {

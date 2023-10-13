@@ -1,5 +1,5 @@
 ---
-syslog_ng::install::packages: {}
+syslog_ng::install::packages: false
 pkg::syslog-ng: 3.29.1
 syslog_ng::install::githubartifact:
   syslog-ng:
