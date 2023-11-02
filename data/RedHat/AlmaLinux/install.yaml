@@ -3,3 +3,4 @@ syslog_ng::install::githubartifact: false
 syslog_ng::install::packages:
   syslog-ng:
     ensure: 3.35.1-6.el%{facts.os.release.major}
+syslog_ng::config::dnf_log_config: true

@@ -4,6 +4,7 @@ class syslog_ng::config (
   Hash $cfg,
   Boolean $control_logrotate_dir,
   Boolean $send_remote,
+  Boolean $dnf_log_config,
 ) {
   if $control_logrotate_dir {
     file {
@@ -66,9 +67,16 @@ class syslog_ng::config (
       mode => "0700",
     ;
   }
-  -> syslog_ng::cfg { "destinations":
-    order => 00,
-    content => template("${module_name}/destinations.conf.erb"),
-    logrotate => false,
+  -> syslog_ng::cfg {
+    "destinations":
+      order => 00,
+      content => template("${module_name}/destinations.conf.erb"),
+      logrotate => false,
+    ;
+    "systemd": send_remote => false;
+    "sshd": send_remote => false;
+  }
+  if $dnf_log_config {
+    syslog_ng::cfg { "dnf": send_remote => false; }
   }
 }

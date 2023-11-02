@@ -98,4 +98,12 @@ log {
     };
     flags(final);
 };
+# from journald logs
+filter f_syslog_ng { program("^syslog-ng"); };
+log {
+    source(s_sys);
+    filter(f_syslog_ng);
+    destination(d_internal);
+    flags(final);
+};
 # }}
