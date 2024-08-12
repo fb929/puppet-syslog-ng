@@ -7,7 +7,7 @@
     dateformat -%Y%m%d-%s
     daily
     dateext
-    maxsize 128M
+    maxsize <%= @logrotate_maxsize %>
     nocompress
     sharedscripts
     postrotate

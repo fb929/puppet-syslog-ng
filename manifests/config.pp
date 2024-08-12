@@ -1,5 +1,6 @@
 class syslog_ng::config (
   Integer $logrotate_count,
+  String $logrotate_maxsize,
   String $conf_dir,
   Hash $cfg,
   Boolean $control_logrotate_dir,

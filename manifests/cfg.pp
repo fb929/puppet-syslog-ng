@@ -5,6 +5,7 @@ define syslog_ng::cfg (
   Optional[String] $content = undef, # custom template
   Boolean $logrotate = true, # enable\disable logrotate config
   Integer $logrotate_count = $::syslog_ng::config::logrotate_count, # default logrotate_count
+  String $logrotate_maxsize = $::syslog_ng::config::logrotate_maxsize, # default logrotate_maxsize
   Optional[String] $logrotate_content = undef, # template for logrotate
   # options for default template {{
   String $logdir = "/var/log/$name",
