@@ -11,6 +11,7 @@ try:
 except ImportError:
     pass
 import logging
+import time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,8 +21,11 @@ SOURCE_NAMES = [
     "destination",
 ]
 CFG = {
-    "SocketPath": ["/var/lib/syslog-ng/syslog-ng.ctl"]
+    "SocketPath": ["/var/lib/syslog-ng/syslog-ng.ctl"],
+    "RetryCount": 5,
+    "RetryDelays": [1, 3, 5],  # further retries repeat the last delay
 }
+time.sleep(3)
 
 def log(param):
     """
@@ -49,16 +53,33 @@ def shutdown():
     log("shutting down...")
 
 def read():
-    try:
-        s = socket.socket(socket.AF_UNIX)
-        s.settimeout(1)
-        s.connect(CFG["SocketPath"][0])
-        s.send("STATS\n".encode())
-        result = s.recv(1048576).decode()
-    except Exception as e:
-        log("failed read stats from socket, error='%s'" % e)
+    retry_count = CFG['RetryCount']
+    retry_delays = CFG['RetryDelays']
+    result = ""
+    for attempt in range(retry_count):
+        # Determine delay for this attempt
+        delay = retry_delays[attempt] if attempt < len(retry_delays) else retry_delays[-1]
+        try:
+            # Attempt to connect and read from the socket
+            s = socket.socket(socket.AF_UNIX)
+            s.settimeout(1)
+            s.connect(CFG["SocketPath"][0])
+            s.send("STATS\n".encode())
+            result = s.recv(1048576).decode()
+        except Exception as e:
+            log("failed read stats from socket, error='%s'" % e)
+            if attempt < retry_count - 1:
+                time.sleep(delay)
+        else:
+            try:
+                result = result.split("\n")[:-2]
+            except Exception as e:
+                log("failed read stats from socket, error='%s'" % e)
+                if attempt < retry_count - 1:
+                    time.sleep(delay)
+            else:
+                break # Success, exit the retry loop
 
-    result = result.split("\n")[:-2]
     result.remove("SourceName;SourceId;SourceInstance;State;Type;Number") # removed header
 
     for line in result:
