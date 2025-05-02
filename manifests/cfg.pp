@@ -1,4 +1,5 @@
 define syslog_ng::cfg (
+  Boolean $ensure = true,                       # should resource files exist or not
   Integer $order = 50,                          # default order for config file
   String $program = "^${name}\$",               # default program regex
   Variant[String, Boolean] $to_program = false, # rewrite to program
@@ -34,6 +35,10 @@ define syslog_ng::cfg (
 
   file {
     $syslog_conf:
+      ensure  => $ensure ? {
+        true  => 'file',
+        false => 'absent',
+      },
       content => $_content,
       require => File[$conf_dir],
       notify => Service["syslog-ng"],
@@ -42,6 +47,10 @@ define syslog_ng::cfg (
   if $logrotate {
     file {
       "/etc/logrotate.d/$name":
+        ensure  => $ensure ? {
+          true  => 'file',
+          false => 'absent',
+        },
         content => $_logrotate_content,
       ;
     }
