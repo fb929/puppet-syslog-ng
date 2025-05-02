@@ -17,13 +17,22 @@ class syslog_ng::config (
         force => true,
         source => "puppet:///modules/${module_name}/logrotate.d",
       ;
-      "/etc/cron.hourly/logrotate":
-        ensure => link,
-        target => "../cron.daily/logrotate",
-      ;
       # }}
     }
+    if $facts['logrotate_timer_available'] {
+        systemd::dropin_file { "logrotate-timer-override.conf":
+          unit => "logrotate.timer",
+          content  => "[Timer]\nOnCalendar=\nOnCalendar=hourly\nPersistent=true\n",
+        }
+        file { "/etc/cron.hourly/logrotate": ensure => absent }
+    } else {
+      file { "/etc/cron.hourly/logrotate":
+        ensure => link,
+        target => "../cron.daily/logrotate",
+      }
+    }
   }
+
   file {
     [
       "/etc/syslog-ng",
