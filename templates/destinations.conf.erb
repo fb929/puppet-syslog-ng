@@ -5,7 +5,7 @@
 destination remote {
     channel {
         rewrite {
-            set("<%= @facts['ec2_tag_role'] %>", value(".SDATA.custom@31853.1.role"));
+            set("<%= @facts['role'] %>", value(".SDATA.custom@31853.1.role"));
             set("<%= @facts['groupname'] %>", value(".SDATA.custom@31853.1.groupname"));
         };
         destination {
