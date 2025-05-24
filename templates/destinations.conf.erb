@@ -24,7 +24,6 @@ destination remote {
                     disk-buf-size(268435456) # 256Mb
                     reliable(yes)
                     compaction(yes)
-                    compression(yes)
                     qout-size(128)
                     dir("<%= settings['disk_buffer']['dir'] %>")
                 )
