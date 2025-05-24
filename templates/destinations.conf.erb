@@ -21,8 +21,11 @@ destination remote {
     <%- if settings['disk_buffer']['enable'] -%>
                 disk-buffer(
                     mem-buf-size(67108864) # 64M
-                    disk-buf-size(1073741824) # 1G
-                    reliable(no)
+                    disk-buf-size(268435456) # 256Mb
+                    reliable(yes)
+                    compaction(yes)
+                    compression(yes)
+                    qout-size(128)
                     dir("<%= settings['disk_buffer']['dir'] %>")
                 )
     <%- end -%>
