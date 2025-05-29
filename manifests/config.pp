@@ -6,6 +6,7 @@ class syslog_ng::config (
   Boolean $control_logrotate_dir,
   Boolean $send_remote,
   Boolean $dnf_log_config,
+  String $logrotate_timer_content,
 ) {
   if $control_logrotate_dir {
     file {
@@ -22,7 +23,7 @@ class syslog_ng::config (
     if $facts['logrotate_timer_available'] {
         systemd::dropin_file { "logrotate-timer-override.conf":
           unit => "logrotate.timer",
-          content  => "[Timer]\nOnCalendar=\nOnCalendar=hourly\nPersistent=true\n",
+          content => $logrotate_timer_content,
         }
         file { "/etc/cron.hourly/logrotate": ensure => absent }
     } else {
