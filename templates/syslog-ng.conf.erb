@@ -89,6 +89,15 @@ source s_internal { internal(); };
 filter f_error { level(err..emerg); };
 destination d_internal { file("/var/log/syslog-ng/info.log"); };
 destination d_internal_errors { file("/var/log/syslog-ng/error.log"); };
+# filter dropping message {{
+filter f_queue_full { match("Destination reliable queue full, dropping message"); };
+log {
+    source(s_internal);
+    filter(f_queue_full);
+    destination(d_null);
+    flags(final);
+};
+# }}
 log {
     source(s_internal);
     destination(d_internal);
