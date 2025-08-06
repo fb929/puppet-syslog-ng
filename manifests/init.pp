@@ -1,4 +1,6 @@
-class syslog_ng {
+class syslog_ng (
+  Optional[Hash] $conf_d = undef, # configuration conf.d files over hiera
+){
   service { "rsyslog":
     ensure => false,
     enable => false,
@@ -15,4 +17,8 @@ class syslog_ng {
   -> class { "${module_name}::config": }
   -> class { "${module_name}::service": }
   -> class { "${module_name}::monitoring": }
+
+  if $conf_d != undef {
+    ensure_resources( 'syslog_ng::cfg', $conf_d )
+  }
 }
