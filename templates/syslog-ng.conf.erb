@@ -26,10 +26,12 @@ template t_full  { template("${YEAR}-${MONTH}-${DAY}T${HOUR}:${MIN}:${SEC}.${MSE
 template t_short { template("$MSG\n"); };
 
 source s_sys {
+<%- unless @facts['virtual'] == 'lxc' -%>
     file (
         "/proc/kmsg"
         program_override("kernel: ")
     );
+<%- end -%>
     systemd-syslog( host-override("<%= @hostname %>") );
 <%- if @cfg['source']['s_sys']['network'] -%>
     network ( ip("127.0.0.1") transport("udp") port(514) host-override("<%= @hostname %>") so-rcvbuf(4194304) );
