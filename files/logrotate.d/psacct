@@ -3,6 +3,7 @@
     compress
     delaycompress
     notifempty
+    missingok
     daily
     rotate 31
     create 0600 root root
