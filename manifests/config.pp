@@ -24,6 +24,11 @@ class syslog_ng::config (
         systemd::dropin_file { "logrotate-timer-override.conf":
           unit => "logrotate.timer",
           content => $logrotate_timer_content,
+          notify => Service["logrotate.timer"],
+        }
+        service { "logrotate.timer":
+          ensure => running,
+          enable => true,
         }
         file { "/etc/cron.hourly/logrotate": ensure => absent }
     } else {
