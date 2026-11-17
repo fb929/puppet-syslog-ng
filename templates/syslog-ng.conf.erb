@@ -1,6 +1,8 @@
 # puppet managed
 # vim:ft=eruby:ai:si:ts=4:sw=4:et:
+<%- unless @facts['syslog_ng_version'].to_s.empty? -%>
 @version:<%= @facts['syslog_ng_version'] %>
+<%- end -%>
 
 options {
     flush_lines (<%= @cfg['options']['flush_lines'] %>);
