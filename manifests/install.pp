@@ -35,8 +35,9 @@ class syslog_ng::install (
           package,
           $packages,
           {
-            ensure => present,
-            notify => Service["syslog-ng"],
+            ensure  => present,
+            require => Class["apt::update"],
+            notify  => Service["syslog-ng"],
           }
         )
       }
