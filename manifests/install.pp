@@ -19,14 +19,16 @@ class syslog_ng::install (
     }
     "Debian": {
       if $packages {
+        $distro_id = downcase($facts['os']['distro']['id'])
         $distro_codename = $facts['os']['distro']['codename']
-        apt::key { "2E6994033390DE82D8E6A2D16E187A4C6694369F":
-          source => "https://ose-repo.syslog-ng.com/apt/syslog-ng-ose-pub.asc",
-        }
-        -> apt::source { "syslog-ng-ose":
+        apt::source { "syslog-ng-ose":
           location => "https://ose-repo.syslog-ng.com/apt/",
           release => "stable",
-          repos => "ubuntu-$distro_codename",
+          repos => "${distro_id}-${distro_codename}",
+          key => {
+            "name"   => "syslog-ng-ose.asc",
+            "source" => "https://ose-repo.syslog-ng.com/apt/syslog-ng-ose-pub.asc",
+          },
           before => Package[keys($packages)],
         }
         ensure_resources(
